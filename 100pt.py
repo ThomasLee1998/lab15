@@ -20,7 +20,7 @@ targety2 = 80
 target = drawpad.create_rectangle(targetx1,targety1,targetx2,targety2, fill="red")
 player = drawpad.create_rectangle(240,240,260,260, fill="orange")
 direction = 4
-
+#
 
 class MyApp:
 	def __init__(self, parent):
