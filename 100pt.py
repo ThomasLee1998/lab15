@@ -17,8 +17,8 @@ targetx1 = 200
 targety1 = 20
 targetx2 = 280
 targety2 = 80
-target = drawpad.create_rectangle(targetx1,targety1,targetx2,targety2, fill="blue")
-player = drawpad.create_rectangle(240,240,260,260, fill="pink")
+target = drawpad.create_rectangle(targetx1,targety1,targetx2,targety2, fill="red")
+player = drawpad.create_rectangle(240,240,260,260, fill="orange")
 direction = 4
 
 
@@ -30,37 +30,92 @@ class MyApp:
 		self.myContainer1 = Frame(parent)
 		self.myContainer1.pack()
 		
+		
 		self.up = Button(self.myContainer1)
 		self.up.configure(text="Up", background= "green")
-		self.up.grid(row=0,column=0)
+		self.up.grid(row=0,column=1)											
+		self.up.bind("<Button-1>", self.moveUp)
+		
+		self.down = Button(self.myContainer1)
+		self.down.configure(text="Down", background= "green")
+		self.down.grid(row=3,column=1)											
+		self.down.bind("<Button-1>", self.moveDown)
+		
+		self.left = Button(self.myContainer1)
+		self.left.configure(text="Left", background= "green")
+		self.left.grid(row=1,column=0)											
+		self.left.bind("<Button-1>", self.moveLeft)
+		
+		self.right = Button(self.myContainer1)
+		self.right.configure(text="Right", background= "green")
+		self.right.grid(row=1,column=3)											
+		self.right.bind("<Button-1>", self.moveRight)
 					
 		# "Bind" an action to the first button												
-		self.up.bind("<Button-1>", self.moveUp)
+		
                 
 		  
 		# This creates the drawpad - no need to change this 
 		drawpad.pack()
 		self.animate()
 
-		
 	def moveUp(self, event):   
 		global player
 		global drawpad
-                drawpad.move(player,0,-10)
+                x1,y1,x2,y2 = drawpad.coords(player)
+		if y1>0:
+		    drawpad.move(player,0,-10)
+    
+        def moveDown(self, event):   
+		global player
+		global drawpad
+		x1,y1,x2,y2 = drawpad.coords(player)
+                if y2 < drawpad.winfo_height():
+                 drawpad.move(player,0,10)
+                
+        def moveRight(self, event):   
+		global player
+		global drawpad
+                x1,y1,x2,y2 = drawpad.coords(player)
+                if x2 < drawpad.winfo_width():
+                  drawpad.move(player,10,0)
+                
+        def moveLeft(self, event):   
+		global player
+		global drawpad
+		global target
+                x1,y1,x2,y2 = drawpad.coords(player)
+		if x1 > 0:
+                 drawpad.move(player,-10,0)
+    
     
          
         # Animate function that will bounce target left and right, and trigger the collision detection  
 	def animate(self):
 	    global target
 	    global direction
+	    global player
+	    tx1,ty1,tx2,ty2 = drawpad.coords(target)
+	    
+	    if tx1 < 0:
+	        direction = 4
+	    if tx2 > 480:
+	        direction = -4
+	    drawpad.move(target, direction, 0)
+	        
+            
 	    
 	    # Insert the code here to make the target move, bouncing on the edges    
+	    didWeHit = self.collisionDetect()
+            if (didWeHit == False):
+                drawpad.after(5,self.animate)
+            else:
+                print "BAMMMMM!"
 	        
 	        
             
-            
-            #  This will trigger our collision detect function
-            didWeHit = self.collisionDetect()
+           
+           
             # Use the value of didWeHit to create an if statement
             # that determines whether to run drawpad.after(1,self.animate) or not
             
@@ -69,9 +124,12 @@ class MyApp:
                 global target
 		global drawpad
                 global player
-                # Get the co-ordinates of our player AND our target
-                # using x1,y1,x2,y2 = drawpad.coords(object)
-
+                x1, x2, y1, y2 = drawpad.coords(player)
+                tx1, ty1, tx2, ty2 = drawpad.coords(target)
+                if (tx1 < x1 and tx2 > x2) and (ty1 < y1 and ty2 > y2):
+                    return True
+                else:
+                    return False
                 # Do your if statement - remember to return True if successful!                
 		
 myapp = MyApp(root)
